@@ -30,8 +30,9 @@ class ContactController
 
     public function index(): void
     {
-        $sort = $_GET['sort'] ?? 'nom_asc';
-        $page = max(1, (int)($_GET['page'] ?? 1));
+        $sort     = $_GET['sort'] ?? 'nom_asc';
+        $page     = max(1, (int)($_GET['page'] ?? 1));
+        $perPage  = 8;
 
         ['contacts' => $contacts, 'page' => $page, 'pages' => $pages, 'total' => $total]
             = $this->service->paginate($sort, $page);

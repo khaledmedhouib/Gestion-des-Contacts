@@ -14,13 +14,26 @@
   const resultsFr     = document.getElementById('resultsPluralFr');
   const noResults     = document.getElementById('noResults');
   const spinner       = document.getElementById('searchSpinner');
+  const resetBtn      = document.querySelector('button[onclick="resetSearch()"]');
 
   let debounceTimer = null;
+  let activeController = null;
 
   searchInput.addEventListener('input', () => {
     const q = searchInput.value.trim();
     clearTimeout(debounceTimer);
+    activeController?.abort();
+    activeController = null;
     debounceTimer = setTimeout(() => doSearch(q), 280);
+  });
+
+  resetBtn?.addEventListener('click', (event) => {
+    event.preventDefault();
+    clearTimeout(debounceTimer);
+    activeController?.abort();
+    activeController = null;
+    searchInput.value = '';
+    showTable();
   });
 
   async function doSearch(q) {
@@ -29,15 +42,27 @@
       return;
     }
 
+    activeController?.abort();
+    const controller = new AbortController();
+    activeController = controller;
+
     if (spinner) spinner.classList.remove('d-none');
 
     try {
-      const res  = await fetch(`index.php?action=search&q=${encodeURIComponent(q)}`);
+      const res  = await fetch(`index.php?action=search&q=${encodeURIComponent(q)}`, {
+        signal: controller.signal,
+      });
       const data = await res.json();
+
+      if (controller.signal.aborted) return;
       renderResults(data.results, data.count, q);
     } catch (err) {
+      if (err.name === 'AbortError') return;
       console.error('Search error:', err);
     } finally {
+      if (activeController === controller) {
+        activeController = null;
+      }
       if (spinner) spinner.classList.add('d-none');
     }
   }
@@ -131,11 +156,16 @@
   function showTable() {
     tableWrapper?.classList.remove('d-none');
     resultsPanel?.classList.add('d-none');
+    noResults?.classList.add('d-none');
     if (searchBody) searchBody.innerHTML = '';
+    if (spinner) spinner.classList.add('d-none');
   }
 
   // Expose for navbar reset button
   window.resetSearch = function () {
+    clearTimeout(debounceTimer);
+    activeController?.abort();
+    activeController = null;
     searchInput.value = '';
     showTable();
   };

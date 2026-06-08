@@ -3,7 +3,7 @@ class Database
 {
     private static ?PDO $instance = null;
 
-    private string $host     = '127.0.0.1';
+    private string $host     = 'localhost';
     private string $dbname   = 'contact_manager';
     private string $username = 'root';
     private string $password = '';
