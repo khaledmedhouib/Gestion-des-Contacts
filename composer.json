@@ -1,0 +1,17 @@
+{
+  "name": "gestion-contacts/app",
+  "description": "Gestion des Contacts Personnels — Projet Universitaire",
+  "type": "project",
+  "require": {
+    "php": ">=8.0",
+    "dompdf/dompdf": "^2.0"
+  },
+  "autoload": {
+    "classmap": [
+      "app/"
+    ]
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}

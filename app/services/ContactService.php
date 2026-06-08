@@ -66,10 +66,10 @@ class ContactService
     {
         $this->assertValid($data);
 
-        $this->model->create([
-            ...$this->sanitize($data),
-            'photo' => $file ? $this->uploader->store($file) : null,
-        ]);
+        $this->model->create(array_merge(
+            $this->sanitize($data),
+            ['photo' => $file ? $this->uploader->store($file) : null]
+        ));
     }
 
     /**
@@ -93,10 +93,10 @@ class ContactService
             $photo = $newPhoto;
         }
 
-        $this->model->update($id, [
-            ...$this->sanitize($data),
-            'photo' => $photo,
-        ]);
+        $this->model->update($id, array_merge(
+            $this->sanitize($data),
+            ['photo' => $photo]
+        ));
     }
 
     public function delete(int $id): void
